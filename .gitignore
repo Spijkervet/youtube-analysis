@@ -3,3 +3,4 @@
 *.json
 credentials.p
 *.sqlite
+__pycache__
