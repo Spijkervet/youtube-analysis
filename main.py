@@ -27,6 +27,7 @@ smtp_handler = logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 587),
                                             subject="Error in YouTube Analysis",
                                             credentials=smtp_creds,
                                             secure=())
+smtp_handler.setLevel(logging.ERROR)
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -137,6 +138,7 @@ def get_video_statistics(yt, video_ids, playlist_id):
 
 if __name__ == "__main__":
     try:
+        asfasdf
         youtube = authenticate()
         playlists = session.query(Playlist).all()
         for p in playlists:
@@ -144,4 +146,4 @@ if __name__ == "__main__":
             video_ids = get_playlist_videos(youtube, p.playlist_id)
             get_video_statistics(youtube, video_ids, p.playlist_id)
     except Exception as e:
-        logging.exception(e)
+        logging.error(e)
