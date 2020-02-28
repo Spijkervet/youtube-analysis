@@ -137,7 +137,6 @@ def get_video_statistics(yt, video_ids, playlist_id):
 
 if __name__ == "__main__":
     try:
-        lkasjdf
         youtube = authenticate()
         playlists = session.query(Playlist).all()
         for p in playlists:
