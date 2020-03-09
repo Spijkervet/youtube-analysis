@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from .database import engine
 
 
@@ -58,7 +58,7 @@ class Video(Base):
 class Statistics(Base):
     __tablename__ = 'statistics'
     id = Column(Integer, primary_key=True)
-    video_id = Column(String)
+    video_id = Column(String, ForeignKey('videos.video_id'))
     datetime = Column('datetime', DateTime)
     views = Column(Integer)
     likes = Column(Integer)

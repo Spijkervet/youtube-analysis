@@ -22,7 +22,7 @@ load_dotenv()
 
 smtp_creds = (os.getenv("SMTP_USER"), os.getenv("SMTP_PASSWORD"))
 smtp_handler = logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 587),
-                                            fromaddr=os.getenv("SMTP_USER"), 
+                                            fromaddr=os.getenv("SMTP_USER"),
                                             toaddrs=[os.getenv("SMTP_USER")],
                                             subject="Error in YouTube Analysis",
                                             credentials=smtp_creds,
@@ -62,7 +62,7 @@ def authenticate():
     else:
         credentials = flow.run_console()
         pickle.dump(credentials, open('credentials.p', 'wb'))
-    
+
     youtube = googleapiclient.discovery.build(
         api_service_name, api_version, credentials=credentials, cache_discovery=False)
     return youtube
@@ -116,7 +116,6 @@ def get_video_statistics(yt, video_ids, playlist_id):
                     v = Video(video_id, playlist_id, published_at, snippet['channelId'], snippet['title'], snippet['description'], snippet['channelTitle'],
                         tags, snippet['categoryId'])
                     session.add(v)
-                    session.commit()
 
                 # add statistics
                 if 'commentCount' not in stats.keys():
@@ -125,15 +124,17 @@ def get_video_statistics(yt, video_ids, playlist_id):
                     stats['likeCount'] = 0
                 if 'dislikeCount' not in stats.keys():
                     stats['dislikeCount'] = 0
+                if 'viewCount' not in stats.keys():
+                    stats['viewCount'] = 0
 
                 s = Statistics(video_id, stats['viewCount'], stats['likeCount'], stats['dislikeCount'], stats['commentCount'])
                 session.add(s)
-                session.commit()
 
             next_page_token = response.get('nextPageToken')
             if next_page_token is None:
                 break
-    
+
+    session.commit()
     logging.warning(f"Added {len(video_ids)} to the Statistics table")
 
 if __name__ == "__main__":
