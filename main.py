@@ -112,7 +112,12 @@ def get_video_statistics(yt, video_ids, playlist_id):
                     if 'tags' in snippet.keys():
                         tags = ','.join(snippet['tags'])
 
-                    published_at = datetime.strptime(snippet['publishedAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                    try:
+                        published_at = datetime.strptime(snippet['publishedAt'], '%Y-%m-%dT%H:%M:%SZ')
+                    except:
+                        published_at = datetime.strptime(snippet['publishedAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                        pass
+                    
                     v = Video(video_id, playlist_id, published_at, snippet['channelId'], snippet['title'], snippet['description'], snippet['channelTitle'],
                         tags, snippet['categoryId'])
                     session.add(v)
