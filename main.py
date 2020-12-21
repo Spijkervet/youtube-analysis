@@ -3,69 +3,14 @@ import pickle
 import numpy as np
 from datetime import datetime
 
-import google_auth_oauthlib.flow
-import googleapiclient.discovery
-import googleapiclient.errors
 from dotenv import load_dotenv
 
+from auth import authenticate
+from log import logging
 from model.database import engine
 from model.model import Playlist, Video, Statistics
 from utils import divide_chunks
 from sqlalchemy.orm import sessionmaker
-
-scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
-
-import logging
-import logging.handlers
-
-load_dotenv()
-
-smtp_creds = (os.getenv("SMTP_USER"), os.getenv("SMTP_PASSWORD"))
-smtp_handler = logging.handlers.SMTPHandler(mailhost=("smtp.gmail.com", 587),
-                                            fromaddr=os.getenv("SMTP_USER"),
-                                            toaddrs=[os.getenv("SMTP_USER")],
-                                            subject="Error in YouTube Analysis",
-                                            credentials=smtp_creds,
-                                            secure=())
-smtp_handler.setLevel(logging.ERROR)
-
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("debug.log"),
-        logging.StreamHandler(),
-        smtp_handler
-    ]
-)
-
-Session = sessionmaker(bind=engine)
-session = Session()
-
-
-def authenticate():
-    # Disable OAuthlib's HTTPS verification when running locally.
-    # *DO NOT* leave this option enabled in production.
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-
-    api_service_name = "youtube"
-    api_version = "v3"
-    client_secrets_file = "client_secret.json"
-
-    # Get credentials and create an API client
-    flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
-        client_secrets_file, scopes)
-
-
-    if os.path.exists('credentials.p'):
-        credentials = pickle.load(open('credentials.p', 'rb'))
-    else:
-        credentials = flow.run_console()
-        pickle.dump(credentials, open('credentials.p', 'wb'))
-
-    youtube = googleapiclient.discovery.build(
-        api_service_name, api_version, credentials=credentials, cache_discovery=False)
-    return youtube
 
 
 def get_playlist_videos(yt, playlist_id):
@@ -142,7 +87,12 @@ def get_video_statistics(yt, video_ids, playlist_id):
     session.commit()
     logging.warning(f"Added {len(video_ids)} to the Statistics table")
 
+
 if __name__ == "__main__":
+    load_dotenv()
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
     try:
         youtube = authenticate()
         playlists = session.query(Playlist).all()
