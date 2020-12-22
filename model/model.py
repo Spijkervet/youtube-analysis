@@ -1,6 +1,7 @@
 import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from .database import engine
 
 
@@ -33,6 +34,7 @@ class Video(Base):
     channel_title = Column(String)
     tags = Column(String)
     category_id = Column(Integer)
+    comments = relationship("Comment", back_populates="video")
 
     def __init__(self, video_id, playlist_id, published_at, channel_id, title, description, channel_title, tags, category_id): #, views, likes, dislikes, comment_count):
         self.video_id = video_id
@@ -72,5 +74,24 @@ class Statistics(Base):
         self.likes = likes
         self.dislikes = dislikes
         self.comment_count = comment_count
+
+class Comment(Base):
+    __tablename__ = "comments"
+    id = Column(Integer, primary_key=True)
+    video_id = Column(String, ForeignKey('videos.video_id'))
+    text = Column(Text)
+    author = Column(String)
+    like_count = Column(Integer)
+    author_channel_id = Column(String)
+    published_at = Column(DateTime)
+    video = relationship("Video", back_populates="comments")
+
+    def __init__(self, video_id, text, author, like_count, author_channel_id, published_at):
+        self.video_id = video_id
+        self.text = text
+        self.author = author
+        self.like_count = like_count
+        self.author_channel_id = author_channel_id
+        self.published_at = published_at
 
 Base.metadata.create_all(bind=engine)

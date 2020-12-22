@@ -13,7 +13,6 @@ with open('playlists.csv', 'r') as f:
         url, name, genre = row
         playlist_id = url.replace('https://www.youtube.com/playlist?list=', '')
 
-
         if session.query(Playlist).filter_by(playlist_id=playlist_id).first() is None:
             playlist = Playlist(playlist_id, name, genre)
             session.add(playlist)
