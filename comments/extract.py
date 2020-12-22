@@ -1,4 +1,5 @@
 import pandas as pd
+from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker
 from model.database import engine
 from model.model import Comment, Video

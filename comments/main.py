@@ -92,7 +92,7 @@ if __name__ == "__main__":
 
         new_video_ids = list(set(video_ids) - set(existing_video_ids))
         add_videos(yt, new_video_ids, without_music_playlist_id)
-        add_comments(yt, new_video_ids)
+        # add_comments(yt, new_video_ids)
 
     except Exception as e:
         logging.error(e)
