@@ -31,3 +31,6 @@ def authenticate():
         api_service_name, api_version, credentials=credentials, cache_discovery=False)
     return youtube
 
+
+if __name__ == "__main__":
+    authenticate()
