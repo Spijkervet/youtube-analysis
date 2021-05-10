@@ -30,6 +30,7 @@ def scroll_driver(scroll_pause_time, max_scrolls):
         # Wait to load page
         time.sleep(scroll_pause_time)
         num_scrolls += 1
+        print("Scrolling... {}/{}".format(num_scrolls, max_scrolls))
 
 
 if __name__ == "__main__":
