@@ -23,8 +23,11 @@ if __name__ == "__main__":
         youtube = authenticate()
         playlists = session.query(Playlist).all()
         for p in playlists:
-            logging.warning(f"Analysing playlist: {p.name}")
-            video_ids = get_playlist_videos(youtube, p.playlist_id)
-            add_videos(youtube, video_ids, p.playlist_id)
+            try:
+                logging.warning(f"Analysing playlist: {p.name}")
+                video_ids = get_playlist_videos(youtube, p.playlist_id)
+                add_videos(youtube, video_ids, p.playlist_id)
+            except Exception as e:
+                print(p.name, p.playlist_id, "has a problem")
     except Exception as e:
         logging.error(e)
