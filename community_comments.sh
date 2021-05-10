@@ -1,0 +1,1 @@
+python -m community_page.main $@
