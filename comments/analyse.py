@@ -12,7 +12,7 @@ from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker
 from model.database import engine
-from model.model import Comment, Video
+from model.model import Comment, Video, CommentTerm
 
 
 def preprocess_text(txt):
@@ -31,7 +31,7 @@ def write_frequent_terms(counter, fn, ne_likes=None):
 
 
 if __name__ == "__main__":
-    MAX_DAYS_AGO = 60
+    MAX_DAYS_AGO = 120
 
     nlp = en_core_web_sm.load()
 
@@ -65,5 +65,10 @@ if __name__ == "__main__":
         if days_ago > MAX_DAYS_AGO:
             break
 
+    
+    num_deleted_items = session.query(CommentTerm).delete()
+    print("Truncated {} items".format(num_deleted_items))
+    session.commit()
+    
     c = Counter(named_entities)
     write_frequent_terms(c, "popular_terms.csv", ne_likes=ne_likes)

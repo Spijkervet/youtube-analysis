@@ -83,7 +83,7 @@ def add_videos(yt, video_ids, playlist_id):
     logging.warning(f"Added {len(video_ids)} to the Statistics table")
 
 
-def get_playlist_videos(yt, playlist_id):
+def get_playlist_videos(yt, playlist_id, limit_date=None):
     next_page_token = None
     video_ids = []
     while True:
@@ -95,6 +95,12 @@ def get_playlist_videos(yt, playlist_id):
         )
         response = request.execute()
         for i in response["items"]:
+            if "videoPublishedAt" in i["contentDetails"].keys():
+                published_at = get_date(i["contentDetails"]["videoPublishedAt"])
+                if limit_date:
+                    if published_at < limit_date:
+                        continue
+            
             video_id = i["contentDetails"]["videoId"]
             video_ids.append(video_id)
         next_page_token = response.get("nextPageToken")

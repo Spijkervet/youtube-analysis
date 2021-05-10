@@ -94,4 +94,16 @@ class Comment(Base):
         self.author_channel_id = author_channel_id
         self.published_at = published_at
 
+class CommentTerm(Base):
+    __tablename__ = "comment_terms"
+    id = Column(Integer, primary_key=True)
+    term = Column(Text)
+    frequency = Column(Integer)
+    n_likes = Column(Integer)
+
+    def __init__(self, term, frequency, n_likes):
+        self.term = term
+        self.frequency = frequency
+        self.n_likes = n_likes
+
 Base.metadata.create_all(bind=engine)

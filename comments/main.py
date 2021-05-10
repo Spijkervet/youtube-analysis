@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-
+from datetime import datetime, timedelta
 from auth import authenticate
 from sqlalchemy.orm import sessionmaker
 from model.database import engine
@@ -73,6 +73,15 @@ def add_comments(yt, video_ids):
     session.commit()
     logging.warning(f"Analysed {len(video_ids)} for comments")
 
+def remove_comments(yt):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    num_deleted_items = session.query(Comment).delete()
+    session.commit()
+    return num_deleted_items
+    
+
 
 if __name__ == "__main__":
     load_dotenv()
@@ -81,18 +90,25 @@ if __name__ == "__main__":
     session = Session()
 
     without_music_playlist_id = "PLCWrO9OZ_XGPln0Bg-hbGi5uvbqS9rSVQ"
+
+    num_days = 90
+    limit_date = datetime.now() - timedelta(days=num_days)
     try:
         yt = authenticate()
-        video_ids = get_playlist_videos(yt, playlist_id=without_music_playlist_id)
+        video_ids = get_playlist_videos(yt, playlist_id=without_music_playlist_id, limit_date=limit_date)
 
-        existing_video_ids = [
-            v.video_id
-            for v in session.query(Video).filter(Video.video_id.in_(video_ids)).all()
-        ]
+        # existing_video_ids = [
+        #    v.video_id
+        #    for v in session.query(Video).filter(Video.video_id.in_(video_ids)).all()
+        #]
 
-        new_video_ids = list(set(video_ids) - set(existing_video_ids))
-        add_videos(yt, new_video_ids, without_music_playlist_id)
-        # add_comments(yt, new_video_ids)
+        #new_video_ids = list(set(video_ids) - set(existing_video_ids))
+        #new_video_ids = new_video_ids[-10:]
+        add_videos(yt, video_ids, without_music_playlist_id)
+        num_deleted_items = remove_comments(yt)
+        print("Deleted {} comments".format(num_deleted_items))
+        print("Adding comments from {} videos".format(len(video_ids)))
+        add_comments(yt, video_ids)
 
     except Exception as e:
         logging.error(e)
